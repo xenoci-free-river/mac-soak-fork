@@ -1,0 +1,16 @@
+name: egress-probe
+# egress-tier-1125: 무료 잡은 빌드 필수 주소만, 충전 조직 잡은 공개 주소 열림. 목록 밖 주소 한 곳과 목록 안 주소 한 곳을 찔러 본다.
+on:
+  workflow_dispatch:
+jobs:
+  mac:
+    runs-on: xenoci-macos
+    timeout-minutes: 10
+    steps:
+      - name: probe
+        run: |
+          echo "EGRESS_PROBE host=$(hostname)"
+          code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 20 https://www.wikipedia.org/ || true)
+          echo "EGRESS_PROBE outside=www.wikipedia.org http=$code"
+          gh=$(curl -s -o /dev/null -w '%{http_code}' --max-time 20 https://api.github.com/ || true)
+          echo "EGRESS_PROBE inside=api.github.com http=$gh"
